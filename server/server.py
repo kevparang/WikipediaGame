@@ -37,12 +37,5 @@ def stream_logs():
 def send_static(path):
     return send_from_directory(app.static_folder, path)
 
-@app.route('/logs', methods=['GET'])
-def stream_logs():
-    def generate():
-        for log in logs:
-            yield f"data: {log}\n\n"
-    return Response(generate(), mimetype='text/event-stream')
-
 if __name__ == '__main__':
     app.run(port=5000, threaded=True)
