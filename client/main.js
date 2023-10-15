@@ -5,6 +5,14 @@ document.getElementById('wiki-form').addEventListener('submit', function(event) 
     var startPage = document.getElementById('start-page').value;
     var finishPage = document.getElementById('finish-page').value;
 
+    var logsElement = document.getElementById('logs');
+    logsElement.innerHTML = ''; // clear previous logs
+
+    var eventSource = new EventSource('/logs');
+    eventSource.onmessage = function(event) {
+        logsElement.innerHTML += event.data + '\n';
+    };
+
     console.log("Sending fetch request...");
     fetch('/find_path', {
         method: 'POST',
@@ -20,21 +28,15 @@ document.getElementById('wiki-form').addEventListener('submit', function(event) 
     .then(data => {
         console.log(data);
         var pathElement = document.getElementById('path');
-        var logsElement = document.getElementById('logs');
         pathElement.innerHTML = ''; // clear previous path
-        logsElement.innerHTML = ''; // clear previous logs
         var pathHtml = '<ul>';
         data.path.forEach(function(page) {
             pathHtml += '<li><a href="' + page + '">' + decodeURIComponent(page) + '</a></li>';
         });
         pathHtml += '</ul>';
         pathElement.innerHTML = pathHtml;
-        var logsHtml = '<pre>';
-        data.logs.forEach(function(log) {
-            logsHtml += log + '\n';
-        });
-        logsHtml += '</pre>';
-        logsElement.innerHTML = logsHtml;
+
+        eventSource.close();
     });
 });
 console.log("Finished fetch request...");

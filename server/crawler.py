@@ -15,10 +15,13 @@ def get_links(page_url):
     print(f"Found {len(links)} links on page: {page_url}")
     return links
 
+import time
+
+logs = []
+
 def find_path(start_page, finish_page):
     queue = [(start_page, [start_page], 0)]
     visited = set()
-    logs = []
 
     while queue:
         (vertex, path, depth) = queue.pop(0)
@@ -26,15 +29,16 @@ def find_path(start_page, finish_page):
             log = f"Following link: {next} (depth {depth})"
             print(log)
             logs.append(log)
+            time.sleep(1)  # simulate a long-running task
             if next == finish_page:
                 log = f"Found finish page: {next}"
                 print(log)
                 logs.append(log)
-                return path + [next], logs
+                return path + [next]
             else:
                 log = f"Adding link to queue: {next}"
                 print(log)
                 logs.append(log)
                 visited.add(next)
                 queue.append((next, path + [next], depth + 1))
-    return [], logs
+    return []
